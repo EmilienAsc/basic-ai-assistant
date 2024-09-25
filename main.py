@@ -50,15 +50,17 @@ def ai_to_speech(completion):
     short_content = ""
     for chunk in completion:
         if chunk.choices[0].delta.content:
-            print(chunk.choices[0].delta.content, end="", flush=True)
             short_content += chunk.choices[0].delta.content
-            new_message["content"] += chunk.choices[0].delta.content
-
-            # a way to increase the speed 
-            if "." in chunk.choices[0].delta.content or "!" in chunk.choices[0].delta.content or "?" in chunk.choices[0].delta.content :
+            print(chunk.choices[0].delta.content, end="", flush=True)
+            
+            # Vérifiez si le contenu contient une ponctuation de fin de phrase
+            if any(punct in chunk.choices[0].delta.content for punct in [".", "!", "?", ",", ":", ";"]):
                 text_to_audio(short_content)
                 short_content = ""
-    history.append(new_message)
+    
+    if short_content:
+        text_to_audio(short_content)
+        history.append({"role": "assistant", "content": short_content})
 
 
 text_to_audio("Hi there !")
